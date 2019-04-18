@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block heading %}
+	Welcome to Book Reviews and Recommendations!
+{% endblock %}
+
+{% block body %}
+	<h5 class ="text-center", style = margin>
+		This website is for users to search for books, and submit reviews.
+	</h5>
+	<p class = "text-center">
+		Please login below to get started (or click
+		<a href="{{ url_for('register') }}">here</a>
+		to register if you are new)!
+	</p>
+{% endblock %}
