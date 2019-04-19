@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block heading %}
+	Book Details
+{% endblock %}
+
+{% block body %}
+	<ul class="list-group">
+		<li class="list-group-item">ISBN: {{ book.isbn }} </li>
+		<li class="list-group-item">Title: {{ book.title }}</li>
+		<li class="list-group-item">Author: {{ book.author }}</li>
+		<li class="list-group-item">Year: {{ book.year }}</li>
+	</ul>
+{% endblock %}

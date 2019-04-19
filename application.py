@@ -28,3 +28,23 @@ def index():
 @app.route("/register")
 def register():
 	return render_template("register.html")
+
+@app.route("/books")
+def books():
+	"""Lists books from search."""
+	books = db.execute("SELECT * FROM books").fetchall()
+	return render_template("books.html", books=books)
+
+@app.route("/books/<string:book_id>")
+def book(book_id):
+	"""Lists details about a single book."""
+
+	#Ensure book exists.
+	book = db.execute("SELECT * FROM books WHERE id = :id", {"id": book_id}).fetchone()
+	if book is None:
+		return render_template("error.html", message="No such book.")
+
+	#Return book details
+	return render_template("book.html", book=book)
+	# TODO: add in section returning results from API.
+	# TODO: add in section to incorporate if any reviews/ratings from my site
