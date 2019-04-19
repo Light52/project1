@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, session, render_template
+from flask import Flask, session, render_template, request
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -29,10 +29,29 @@ def index():
 def register():
 	return render_template("register.html")
 
-@app.route("/books")
+@app.route("/search", methods=["GET"])
+def search():
+	"""Search for """
+	# TODO: add search function linking to /books
+	return render_template("search.html")
+
+@app.route("/books", methods=["POST"])
 def books():
 	"""Lists books from search."""
-	books = db.execute("SELECT * FROM books").fetchall()
+
+	#info from form
+	isbn = request.form.get("isbn")
+	title = request.form.get("title")
+	author = request.form.get("author")
+	query = db.execute("SELECT * FROM books \
+				WHERE title LIKE CONCAT('%', :title, '%') AND \
+				isbn LIKE CONCAT('%', :isbn, '%') AND \
+				author LIKE CONCAT('%', :author, '%')",
+				{"title": title, "isbn": isbn, "author": author})
+
+	if query.rowcount == 0:
+		return render_template("error.html", message = "No book exists with search parameters")
+	books = query.fetchall()
 	return render_template("books.html", books=books)
 
 @app.route("/books/<string:book_id>")

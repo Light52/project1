@@ -1,9 +1,23 @@
 {% extends "layout.html" %}
 
 {% block heading %}
-	Search for a book below:
+	Search for a book below (fill in one or more search fields):
 {% endblock %}
 
 {% block body %}
+<form class="" action="{{ url_for('books') }}" method="post">
+	<div class="form-group">
+		<input class="form-control" name="isbn" placeholder="ISBN">
+	</div>
+	<div class="form-group">
+		<input class="form-control" name="title" placeholder="Book Title">
+	</div>
+	<div class="form-group">
+		<input class="form-control" name="author" placeholder="Author Name">
+	</div>
 
+	<div class="form-group">
+		<button class="btn btn-primary">Search</button>
+	</div>
+</form>
 {% endblock %}
