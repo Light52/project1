@@ -1,4 +1,5 @@
 import os
+import requests
 
 from flask import Flask, session, render_template, request
 from flask_session import Session
@@ -49,8 +50,9 @@ def books():
 				author LIKE CONCAT('%', :author, '%')",
 				{"title": title, "isbn": isbn, "author": author})
 
+	#if search returns no results
 	if query.rowcount == 0:
-		return render_template("error.html", message = "No book exists with search parameters")
+		return render_template("error.html", message = "No book matches the search criteria. Please try again.")
 	books = query.fetchall()
 	return render_template("books.html", books=books)
 
@@ -63,7 +65,13 @@ def book(book_id):
 	if book is None:
 		return render_template("error.html", message="No such book.")
 
+	#return results from Good Reads API
+	res = requests.get("https://www.goodreads.com/book/review_counts.json",
+	params = {"key": "vcnuyAAHLVhYg4R2pNJjw", "isbns":"9781632168146"})
+	data = res.json()
+	num_ratings = data["books"][0]["work_ratings_count"]
+	avg_rating = data["books"][0]["average_rating"]
 	#Return book details
-	return render_template("book.html", book=book)
+	return render_template("book.html", book=book, num_ratings=num_ratings, avg_rating=avg_rating)
 	# TODO: add in section returning results from API.
 	# TODO: add in section to incorporate if any reviews/ratings from my site

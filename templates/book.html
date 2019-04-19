@@ -11,4 +11,10 @@
 		<li class="list-group-item">Author: {{ book.author }}</li>
 		<li class="list-group-item">Year: {{ book.year }}</li>
 	</ul>
+	<br>
+	<h5>Goodreads Ratings</h5>
+	<ul class = "list-group">
+		<li class="list-group-item">Number of Ratings: {{ num_ratings }}</li>
+		<li class="list-group-item">Average Rating: {{ avg_rating }} out of 5</li>
+	</ul>
 {% endblock %}
