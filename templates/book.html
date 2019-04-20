@@ -17,4 +17,31 @@
 		<li class="list-group-item">Number of Ratings: {{ num_ratings }}</li>
 		<li class="list-group-item">Average Rating: {{ avg_rating }} out of 5</li>
 	</ul>
+	<br>
+	<h5>Personal Review</h5>
+	<form class="" action="{{ url_for('review', book_id=book.id) }}" method="post">
+		<div class="form-group">
+			<input class="form-control" name="num_review" placeholder="Submit a number review from 1 to 5.">
+		</div>
+		<div class="form-group">
+			<input class="form-control" name="text_review" id="text_review" placeholder="Submit a text review!">
+			<small id="text_review" class="form-text text-muted">
+				"Please note you can only submit one review per book."
+			</small>
+		</div>
+		<div class="form-group">
+			<button class="btn btn-primary">Search</button>
+		</div>
+	</form>
+	<br>
+	{% if reviews|length > 0 %}
+	<h5>Other Reviews</h5>
+	<ul>
+		{% for review in reviews %}
+		<li>Rating: {{ review.rating }}</li>
+		<li>Review: {{ review.review }}</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+
 {% endblock %}

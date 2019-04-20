@@ -19,6 +19,6 @@ CREATE TABLE IF NOT EXISTS reviews(
 	review_id SERIAL PRIMARY KEY,
 	review VARCHAR NOT NULL,
 	rating INTEGER NOT NULL,
-	book_id INTEGER REFERENCES books(id),
-	user_id INTEGER REFERENCES users(user_id)
+	book_id INTEGER NOT NULL REFERENCES books(id),
+	user_id INTEGER NOT NULL REFERENCES users(user_id)
 );
