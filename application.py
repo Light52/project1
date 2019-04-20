@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 app = Flask(__name__)
-
+app.secret_key = 'testapp'
 # Check for environment variable
 if not os.getenv("DATABASE_URL"):
     raise RuntimeError("DATABASE_URL is not set")
@@ -26,8 +26,10 @@ db = scoped_session(sessionmaker(bind=engine))
 def index():
     return render_template("home.html")
 
-@app.route("/register")
+@app.route("/register", methods = ["GET"])
 def register():
+	if session.get("logged_in") is not None:
+		return render_template('error.html', message="Already logged in. Proceed to search, or log out then register.")
 	return render_template("register.html")
 
 @app.route("/register/success", methods = ["POST"])
@@ -53,17 +55,31 @@ def search():
 	"""return the search page, after validating user login info."""
 	# TODO: add search function linking to /books
 	#user should be coming after the login page - check if user has logged in successfully.
-	username = request.form.get("username")
-	password = request.form.get("password")
-	query = db.execute("SELECT * FROM users \
-					WHERE username = :username AND \
-					password = :password",
-					{"username": username, "password": password})
-	#if username and password do not match, return error.
-	if query.rowcount == 0:
-		return render_template("error.html", message="Invalid username or password. Please register a new account if necessary.")
-	user = query.fetchall()
-	return render_template("search.html", user = user)
+	if request.method == "POST":
+		username = request.form.get("username")
+		password = request.form.get("password")
+		query = db.execute("SELECT * FROM users \
+						WHERE username = :username AND \
+						password = :password",
+						{"username": username, "password": password})
+		#if username and password do not match, return error.
+		if query.rowcount == 0:
+			return render_template("error.html", message="Invalid username or password. Please register a new account if necessary.")
+		user = query.fetchall()
+
+		#set sessions to logged in and Username
+		session["username"] = username
+		session["logged_in"] = True
+		return render_template("search.html")
+	else:
+		#if already logged in
+		if session.get("logged_in") is not None:
+			if session['logged_in'] == True:
+				return render_template("search.html")
+		else:
+			return render_template("error.html", message="Not logged in. Please login to continue.")
+
+
 
 @app.route("/books", methods=["POST"])
 def books():
@@ -100,7 +116,18 @@ def book(book_id):
 	data = res.json()
 	num_ratings = data["books"][0]["work_ratings_count"]
 	avg_rating = data["books"][0]["average_rating"]
+
+	# section to incorporate if any reviews/ratings from my site
+
+
 	#Return book details
 	return render_template("book.html", book=book, num_ratings=num_ratings, avg_rating=avg_rating)
-	# TODO: add in section returning results from API.
-	# TODO: add in section to incorporate if any reviews/ratings from my site
+
+
+
+@app.route('/logout')
+def logout():
+	#remove user from session if exists
+	session.pop('username', None)
+	session.pop('logged_in', None)
+	return render_template('logout.html')
