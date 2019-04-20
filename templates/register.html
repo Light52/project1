@@ -5,5 +5,17 @@
 {% endblock %}
 
 {% block body %}
-	<p>register form</p>
+<form action = "{{ url_for('first_register') }}" method="post">
+	<div class="form-group">
+		<label for="username">Username</label>
+		<input type="text" class="form-control" id="username" name="username" placeholder="Create a new username">
+	</div>
+	<div class="form-group">
+		<label for="password">Password</label>
+		<input type="password" class="form-control" name="password" id="password" placeholder="Create a password">
+	</div>
+	<div class="form-group">
+		<button type="submit" class="btn btn-primary">Register</button>
+	</div>
+</form>
 {% endblock %}

@@ -30,11 +30,40 @@ def index():
 def register():
 	return render_template("register.html")
 
-@app.route("/search", methods=["GET"])
+@app.route("/register/success", methods = ["POST"])
+def first_register():
+	"""First time register - insert into table."""
+	username = request.form.get("username")
+	password = request.form.get("password")
+	query = db.execute("SELECT * FROM users \
+					WHERE username = :username",
+					{"username": username})
+
+	#if user already exists, do not insert into table.
+	if query.rowcount != 0:
+		return render_template("error.html", message="Username already exists, please go to login page and login instead.")
+
+	db.execute("INSERT INTO users (username, password) VALUES (:username, :password)",
+		{"username": username, "password": password})
+	db.commit()
+	return render_template("success.html")
+
+@app.route("/search", methods=["POST", "GET"])
 def search():
-	"""Search for """
+	"""return the search page, after validating user login info."""
 	# TODO: add search function linking to /books
-	return render_template("search.html")
+	#user should be coming after the login page - check if user has logged in successfully.
+	username = request.form.get("username")
+	password = request.form.get("password")
+	query = db.execute("SELECT * FROM users \
+					WHERE username = :username AND \
+					password = :password",
+					{"username": username, "password": password})
+	#if username and password do not match, return error.
+	if query.rowcount == 0:
+		return render_template("error.html", message="Invalid username or password. Please register a new account if necessary.")
+	user = query.fetchall()
+	return render_template("search.html", user = user)
 
 @app.route("/books", methods=["POST"])
 def books():
@@ -45,9 +74,9 @@ def books():
 	title = request.form.get("title")
 	author = request.form.get("author")
 	query = db.execute("SELECT * FROM books \
-				WHERE title LIKE CONCAT('%', :title, '%') AND \
-				isbn LIKE CONCAT('%', :isbn, '%') AND \
-				author LIKE CONCAT('%', :author, '%')",
+				WHERE LOWER(title) LIKE LOWER(CONCAT('%', :title, '%')) AND \
+				LOWER(isbn) LIKE LOWER(CONCAT('%', :isbn, '%')) AND \
+				LOWER(author) LIKE LOWER(CONCAT('%', :author, '%'))",
 				{"title": title, "isbn": isbn, "author": author})
 
 	#if search returns no results
